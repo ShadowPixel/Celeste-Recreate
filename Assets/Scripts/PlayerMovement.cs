@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     private Collision coll;
 
     public Rigidbody2D PlayerRB;
-    private AnimationScript Anim;
+    private Animations Anim;
 
     [Space]
     [Header("Stats")]
@@ -44,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
     {
         coll = GetComponent<Collision>();
         PlayerRB = GetComponent<Rigidbody2D>();
-        Anim = GetComponentInChildren<AnimationScript>();
+        Anim = GetComponentInChildren<Animations>();
     }
 
     void Update()
@@ -55,7 +55,7 @@ public class PlayerMovement : MonoBehaviour
         float yRaw = Input.GetAxisRaw("Vertical");
         Vector2 dir = new Vector2(x, y);
 
-        Walk(direction);
+        Walk(dir);
         Anim.SetHorizontalMovement(x, y, PlayerRB.velocity.y);
 
         if (coll.onWall && Input.GetButton("Fire3") && canMove)
@@ -100,7 +100,7 @@ public class PlayerMovement : MonoBehaviour
             if (x != 0 && !wallGrabbed)
             {
                 wallSlide = true;
-                wallSlide();
+                WallSlide();
             }
         }
 
@@ -115,11 +115,11 @@ public class PlayerMovement : MonoBehaviour
 
             if (coll.onGround)
             {
-                jumpForce(Vector2.up, false);
+                Jump(Vector2.up, false);
             }
             if (coll.onWall && !coll.onGround)
             {
-                wallJump();
+                WallJump();
             }
         }
 
@@ -127,19 +127,19 @@ public class PlayerMovement : MonoBehaviour
         {
             if (xRaw != 0 || yRaw != 0)
             {
-                dashParticle(xRaw, yRaw);
+                Dash(xRaw, yRaw);
             }
         }
 
-        if (coll.onGround && !groundTouch)
+        if (coll.onGround && !onGround)
         {
-            groundTouch = true;
-            GroundTouch();
+            OnGround();
+            onGround = true;
         }
 
-        if (!coll.onGround && groundTouch)
+        if (!coll.onGround && onGround)
         {
-            groundTouch = false;
+            onGround = false;
         }
 
         WallParticle(y);
@@ -161,7 +161,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void GroundTouch()
+    void OnGround()
     {
         hasDashed = false;
         isDashing = false;
@@ -175,7 +175,6 @@ public class PlayerMovement : MonoBehaviour
     {
         Camera.main.transform.DOComplete();
         Camera.main.transform.DOShakePosition(.2f, .5f, 14, 90, false, true);
-        FindObjectOfType<RippleEffect>().Emit(Camera.main.WorldToViewportPoint(transform.position));
 
         hasDashed = true;
 
@@ -190,7 +189,7 @@ public class PlayerMovement : MonoBehaviour
 
     IEnumerator DashPause()
     {
-        FindObjectOfType<GhostTrail>().ShowGhost();
+        FindObjectOfType<GhostEffect>().ShowGhost();
         StartCoroutine(GroundDash());
         DOVirtual.Float(14, 0, .8f, RigidbodyDrag);
 
@@ -198,6 +197,14 @@ public class PlayerMovement : MonoBehaviour
         PlayerRB.gravityScale = 0;
         GetComponent<BetterJumping>().enabled = false;
         wallJump = true;
+        isDashing = false;
+
+        yield return new WaitForSeconds(.3f);
+
+        dashParticle.Stop();
+        PlayerRB.gravityScale = 3;
+        GetComponent<BetterJumping>().enabled = true;
+        wallJump = false;
         isDashing = false;
     }
 
@@ -282,7 +289,7 @@ public class PlayerMovement : MonoBehaviour
     IEnumerator DisableMovement(float time)
     {
         canMove = false;
-        yield return new WaitforSeconds(time);
+        yield return new WaitForSeconds(time);
         canMove = true;
     }
 

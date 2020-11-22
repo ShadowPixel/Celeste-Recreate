@@ -5,7 +5,7 @@ using UnityEngine;
 public class Animations : MonoBehaviour
 {
     private Animator Anim;
-    private Movement move;
+    private PlayerMovement move;
     private Collision coll;
     
     public SpriteRenderer sr;
@@ -14,7 +14,7 @@ public class Animations : MonoBehaviour
     {
         Anim = GetComponent<Animator>();
         coll = GetComponentInParent<Collision>();
-        move = GetComponentInParent<Movement>();
+        move = GetComponentInParent<PlayerMovement>();
         sr = GetComponent<SpriteRenderer>();
     }
 
@@ -23,7 +23,7 @@ public class Animations : MonoBehaviour
         Anim.SetBool("onGround", coll.onGround);
         Anim.SetBool("onWall", coll.onWall);
         Anim.SetBool("onRightWall", coll.onRightWall);
-        Anim.SetBool("wallGrab", move.wallGrab);
+        Anim.SetBool("wallGrab", move.wallGrabbed);
         Anim.SetBool("wallSlide", move.wallSlide);
         Anim.SetBool("canMove", move.canMove);
         Anim.SetBool("isDashing", move.isDashing);
@@ -44,7 +44,7 @@ public class Animations : MonoBehaviour
 
     public void Flip(int side)
     {
-        if (move.wallGrab || move.wallSlide)
+        if (move.wallGrabbed || move.wallSlide)
         {
             if (side == -1 && sr.flipX)
             {

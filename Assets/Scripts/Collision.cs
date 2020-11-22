@@ -34,14 +34,14 @@ public class Collision : MonoBehaviour
         wallSide = onRightWall ? -1 : 1;
     }
 
-    void OnDrawChar()
+    void OnDrawGizmo()
     {
-        Char.color = Color.red;
+        Gizmos.color = Color.red;
 
         var positions = new Vector2[] {bottomOffset, rightOffset, leftOffset};
 
-        Char.DrawWireSphere((Vector2)transform.position + bottomOffset, collisionRadius);
-        Char.DrawWireSphere((Vector2)transform.position + rightOffset, collisionRadius);
-        Char.DrawWireSphere((Vector2)transform.position + leftOffset, collisionRadius);
+        Gizmos.DrawWireSphere((Vector2)transform.position + bottomOffset, collisionRadius);
+        Gizmos.DrawWireSphere((Vector2)transform.position + rightOffset, collisionRadius);
+        Gizmos.DrawWireSphere((Vector2)transform.position + leftOffset, collisionRadius);
     }
 }
